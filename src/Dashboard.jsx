@@ -26,7 +26,6 @@ ChartJS.register(
 
 export default function Dashboard() {
     const [chartData, setChartData] = useState(null);
-    const [selectedTab, setselectedTab] = useState('dashboard');
     const currencyList = [
         {name: "USD", imgUrl: "https://res.cloudinary.com/dcril21yl/image/upload/v1686857739/usa_zri7rl.svg", alt:"USA flag", symbol: '$'} ,
         {name: "GBP", imgUrl: "https://res.cloudinary.com/dcril21yl/image/upload/v1684446209/clearer/gbFlag_ae332p.svg", alt:"British flag", symbol: '£'},
