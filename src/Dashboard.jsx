@@ -35,13 +35,90 @@ export default function Dashboard() {
     ];
     const selectedCurrency = [
         {name: "NGN", imgUrl: "https://res.cloudinary.com/dcril21yl/image/upload/v1684425946/clearer/Nigeria_e7h4en.svg", alt:"USA flag", symbol: '₦'}
-    ]
+    ];
+
+    const formatNumber = (value) =>  {
+        if (value >= 1_000_000_000) {
+          return (value / 1_000_000_000).toFixed(1).replace(/\.0$/, '') + 'b';
+        }
+        if (value >= 1_000_000) {
+          return (value / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'm';
+        }
+        if (value >= 1_000) {
+          return (value / 1_000).toFixed(1).replace(/\.0$/, '') + 'k';
+        }
+        return value.toString();
+    }
+
+    const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false // Hide if not needed, or set `position: 'top'` if desired
+          },
+          tooltip: {
+            mode: 'index',
+            intersect: false,
+            backgroundColor: '#fff',
+            titleColor: '#000',
+            bodyColor: '#000',
+            borderColor: '#e5e7eb',
+            borderWidth: 1,
+            titleFont: { family: 'Inter, sans-serif', size: 14, weight: '500' },
+            bodyFont: { family: 'Inter, sans-serif', size: 13 },
+            padding: 10,
+          }
+        },
+        elements: {
+          line: {
+            tension: 0.4,
+            borderWidth: 2,
+          },
+          point: {
+            radius: 0,
+            hoverRadius: 5,
+            hitRadius: 10,
+          }
+        },
+        scales: {
+          x: {
+            grid: {
+              display: false
+            },
+            ticks: {
+              color: 'none',
+              font: {
+                family: 'Inter, sans-serif',
+                size: 12
+              }
+            }
+          },
+          y: {
+            position: 'right',
+            grid: {
+              color: '#f3f4f6',
+              drawBorder: false,
+            },
+            ticks: {
+              color: '#6b7280',
+              font: {
+                family: 'Inter, sans-serif',
+                size: 12
+              },
+              callback: function(value) {
+                return `₦${formatNumber(value)}`;
+              }
+            }
+          }
+        }
+      }
   
     useEffect(() => {
       async function fetchData() {
-        const res = await fetch("https://mocki.io/v1/3e6585f6-0719-4a59-aaa6-981f9a0f8a58");
+        const res = await fetch("https://mocki.io/v1/eb6d1c8f-fe94-45a5-9b6f-aa2f0a744424");
         const data = await res.json();
-        const labels = data.map(entry => new Date(entry.timestamp).toLocaleDateString());
+        const labels = data.map((entry,indx) => indx + 1);
         const moneyIn = data.map(entry => entry.moneyIn);
         const moneyOut = data.map(entry => entry.moneyOut);
   
@@ -52,16 +129,16 @@ export default function Dashboard() {
               label: "Money In",
               data: moneyIn,
               fill: true,
-              backgroundColor: "rgba(34,197,94,0.1)",
-              borderColor: "#22c55e",
+              backgroundColor: "rgba(255,195,0,0.1)",
+              borderColor: "#ffc300",
               tension: 0.4,
             },
             {
               label: "Money Out",
               data: moneyOut,
               fill: true,
-              backgroundColor: "rgba(239,68,68,0.1)",
-              borderColor: "#ef4444",
+              backgroundColor: "rgb(255,117,143,0.1)",
+              borderColor: "#ff4d6d",
               tension: 0.4,
             }
           ]
@@ -270,28 +347,17 @@ export default function Dashboard() {
                             </button>
                         </div>
                         <div className="h-64">
-                        {chartData ? (
-                            <Line data={chartData} options={{
-                            responsive: true,
-                            plugins: {
-                                legend: {
-                                position: 'top',
-                                },
-                            },
-                            scales: {
-                                y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    callback: function(value) {
-                                    return `₦${value.toLocaleString()}`;
-                                    }
-                                }
-                                }
-                            }
-                            }} />
-                        ) : (
-                            <div className="text-gray-500 text-sm text-center py-20">Loading chart...</div>
-                        )}
+                            {chartData ? (
+                                <>
+                                    <div className="flex gap-5 w-full pb-3">
+                                        <p className="flex gap-1 text-xs font-semibold text-light_grey"> <div className="w-2 h-2 bg-[#ffc300] my-auto"/> Money in <span className="font-bold text-black">₦1,000,000</span></p>
+                                        <p className="flex gap-1 text-xs font-semibold text-light_grey"> <div className="w-2 h-2 bg-[#ff4d6d] my-auto" />Money out <span className="font-bold text-black">₦1,000,000</span></p>
+                                    </div>
+                                    <Line data={chartData} options={chartOptions} />
+                                </>
+                            ) : (
+                                <div className="text-gray-500 text-sm text-center py-20">Loading chart...</div>
+                            )}
                         </div>
                     </CardContent>
                 </Card>
